@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LibreText - Send Free SMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-700 to-indigo-900 text-white flex items-center justify-center min-h-screen">
+  <div class="bg-white text-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-8 space-y-6">
+    <h1 class="text-3xl font-bold text-center text-blue-700">LibreText 📱</h1>
+    <p class="text-center text-sm text-gray-500">Send free SMS — ICT-1 MIL-GROUP3</p>
+
+    <form id="smsForm" class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold mb-1">Phone Number</label>
+        <input type="text" id="number" required placeholder="09XXXXXXXXX" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Your Message</label>
+        <textarea id="message" required placeholder="Type your message..." rows="4" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-semibold mb-1">Sender Name (optional)</label>
+        <input type="text" id="sender" placeholder="Anonymous" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+      </div>
+      <button type="submit" class="w-full bg-blue-700 text-white font-bold py-2 rounded-lg hover:bg-blue-800">Send SMS</button>
+    </form>
+
+    <div id="response" class="text-center text-sm mt-4"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('smsForm');
+    const responseDiv = document.getElementById('response');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      responseDiv.innerHTML = "⏳ Sending message...";
+      const number = document.getElementById('number').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const sender = document.getElementById('sender').value.trim() || 'Anonymous';
+
+      try {
+        const res = await fetch(`/api/send?number=${encodeURIComponent(number)}&message=${encodeURIComponent(message)}&sender=${encodeURIComponent(sender)}`);
+        const data = await res.json();
+        if (data.success) {
+          responseDiv.innerHTML = `✅ Message sent successfully to ${data.data.recipient}`;
+        } else {
+          responseDiv.innerHTML = `❌ Error: ${data.error || data.data.status}`;
+        }
+      } catch (err) {
+        responseDiv.innerHTML = `⚠️ Failed: ${err.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
